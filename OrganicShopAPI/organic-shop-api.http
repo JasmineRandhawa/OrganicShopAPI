@@ -1,0 +1,46 @@
+### GetAll Categories
+GET https://localhost:5001/Api/Categories/All HTTP/1.1
+content-type: application/json
+
+### GetById Category
+GET https://localhost:5001/Api/Categories/1 HTTP/1.1
+content-type: application/json
+
+### GetAll Products
+GET https://localhost:5001/Api/Products/All HTTP/1.1
+content-type: application/json
+
+### GetById Product
+GET https://localhost:5001/Api/Products/1 HTTP/1.1
+content-type: application/json
+
+### Add Product
+POST https://localhost:5001/Api/Products/Add HTTP/1.1
+content-type: application/json
+
+{
+    "Title": "Bread",
+    "ImageURL": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/199px-Red_Apple.jpg",
+    "CategoryId" : 1,
+    "IsActive" : true
+}
+
+### Update Product
+PUT https://localhost:5001/Api/Products/Update HTTP/1.1
+content-type: application/json
+
+{
+    "Id" : 1,
+    "Title": "Apple",
+    "ImageURL": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/199px-Red_Apple.jpg",
+    "CategoryId" : 1,
+    "IsActive" : false
+}
+
+### Deactivate Product
+PATCH https://localhost:5001/Api/Products/Deactivate/1 HTTP/1.1
+content-type: application/json
+
+### Activate Product
+PATCH https://localhost:5001/Api/Products/Activate/1 HTTP/1.1
+content-type: application/json
