@@ -36,7 +36,7 @@ jobs:
 
       - name : Run Automated Tests
         env : 
-          ConnectionStrings__DefaultConnection : Server=localhost;Database=OrganicShop_Test;User=sa;Password=Goodwish55
+          ConnectionStrings__DefaultConnection : Server=localhost,1433;Database=OrganicShop_Test;User=sa;Password=Goodwish55;MultipleActiveResultSets=True;
         run : dotnet test -c Release --no-build
 
       - name : Publish app
