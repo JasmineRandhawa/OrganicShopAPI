@@ -36,12 +36,14 @@ jobs:
 
       - name: Restore donettool
         run: dotnet tool install --global dotnet-ef
+        working-directory: ./OrganicShopAPI
 
       - name: update database
         run: dotnet-ef database update --no-build
+        working-directory: ./OrganicShopAPI
 
       - name : Run Automated Tests
-        run : dotnet test -c Release --no-build --verbosity normal
+        run : dotnet test -c Release --no-build --verbosity normal  
 
       - name : Publish app
         run : dotnet publish -c Release -o ./out
