@@ -70,7 +70,6 @@ namespace OrganicShopAPITest.IntegrationTests
                     new ViewComponentFeatureProvider()
                 }
             };
-
             services.AddSingleton(manager);
         }
 

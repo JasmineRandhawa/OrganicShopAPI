@@ -4,9 +4,11 @@ using System.Net.Http;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
-
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using OrganicShopAPI;
 using OrganicShopAPI.Constants;
+using OrganicShopAPI.DataAccess;
 using OrganicShopAPI.Models;
 
 using Xunit;
@@ -25,6 +27,15 @@ namespace OrganicShopAPITest.IntegrationTests
         [Fact]
         public async Task GetAllCategories_WithoutFilter_ReturnsListOfAllCategories()
         {
+            var configurationBuilder = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+            var optionsBuilder = new DbContextOptionsBuilder<OrganicShopDbContext>();
+            optionsBuilder.UseSqlServer(configurationBuilder["ConnectionStrings:DefaultConnection"]);
+
+            var context = new OrganicShopDbContext(optionsBuilder.Options);
+
+            await context.Database.EnsureDeletedAsync();
+            await context.Database.EnsureCreatedAsync();
+
             // Arrange
             var request = TestRoutes.AllCategories;
 
