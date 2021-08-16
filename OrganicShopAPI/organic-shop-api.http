@@ -24,7 +24,7 @@ content-type: application/json
 {
     "Id" : 1,
     "Name" : "Jasmine Randhawa",
-    "Email" : "jasminerandhawa@abc.com",
+    "Email" : "jasminerandhawa7@abc.com",
     "IsAdmin" : true
 }
 
@@ -118,7 +118,7 @@ GET https://localhost:5001/Api/ShoppingCart/User/1 HTTP/1.1
 content-type: application/json
 
 ### GetById ShoppingCart
-GET https://localhost:5001/Api/ShoppingCart/1 HTTP/1.1
+GET https://localhost:5001/Api/ShoppingCart/2 HTTP/1.1
 content-type: application/json
 
 ### Add ShoppingCart
@@ -129,8 +129,8 @@ content-type: application/json
     "AppUserId" : 1,
     "Items" : [
         {
-            "ProductId" : 1,
-            "Quantity" : 2
+            "ProductId" : 3,
+            "Quantity" : 5
         }
     ]
 }
@@ -140,7 +140,7 @@ PATCH https://localhost:5001/Api/ShoppingCart/Update HTTP/1.1
 content-type: application/json
 
 {
-    "Id" : 1,
+    "Id" : 2,
     "AppUserId" : 1,
     "Items" : [
         {
