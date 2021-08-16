@@ -6,7 +6,9 @@ using OrganicShopAPI.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+
 
 namespace OrganicShopAPI.Controllers
 {
@@ -18,11 +20,13 @@ namespace OrganicShopAPI.Controllers
 
         private readonly OrganicShopDbContext _context;
         private readonly IRepository<AppUser> _userRepository;
+        private readonly IRepository<ShoppingCart> _cartRepository;
 
-        public UsersController(OrganicShopDbContext context,IRepository<AppUser> userRepository)
+        public UsersController(OrganicShopDbContext context,IRepository<AppUser> userRepository, IRepository<ShoppingCart> shoppingCartRepository)
         {
             _context = context;
             _userRepository = userRepository;
+            _cartRepository = shoppingCartRepository;
         }
 
         #endregion
@@ -33,20 +37,14 @@ namespace OrganicShopAPI.Controllers
         [Route(Routes.All)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<AppUser>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetAll()
         {
             try
             {
-                var users = _userRepository.GetAll()
-                                           .ToList();
-                                                 
-                if (users != null)
-                    return users.Count > 0 ? Ok(users.OrderByDescending(user => user.IsActive)) 
-                                                : NoContent();
+                var users = _userRepository.GetAll();
 
-                return NotFound();
+                return (users != null && users.Count() > 0) ? Ok(users.ToList()) : NoContent();
             }
             catch(Exception)
             {
@@ -71,7 +69,7 @@ namespace OrganicShopAPI.Controllers
                 if(user != null)
                     return Ok(user);
 
-                return NotFound($"AppUser{nameof(Id)} : {Id + ErrorMessages.DoesNotExist}");
+                return NotFound($"{nameof(AppUser)} {nameof(Id)} '{Id}' {ErrorMessages.DoesNotExist}");
             }
             catch (Exception)
             {
@@ -103,7 +101,7 @@ namespace OrganicShopAPI.Controllers
             }
         }
 
-        [HttpPut(Routes.Update)]
+        [HttpPatch(Routes.Update)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AppUser))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
@@ -119,10 +117,11 @@ namespace OrganicShopAPI.Controllers
 
                 var dbAppUser = await _userRepository.Get(user.Id);
                 if (dbAppUser == null)
-                    return NotFound($"AppUser{nameof(user.Id)} : {user.Id + ErrorMessages.DoesNotExist}");
+                    return NotFound($"{nameof(AppUser)} {nameof(user.Id)} '{user.Id}' {ErrorMessages.DoesNotExist}");
 
                 dbAppUser.Name = user.Name;
                 dbAppUser.Email = user.Email;
+                dbAppUser.IsAdmin = user.IsAdmin;
 
                 await _context.SaveChangesAsync();
                 return Ok(dbAppUser);
@@ -143,11 +142,11 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (Id <= 0)
-                    return BadRequest($"AppUser{nameof(Id) + ErrorMessages.LessThenZero}");
+                    return BadRequest($"{nameof(AppUser)}{nameof(Id) + ErrorMessages.LessThenZero}");
 
                 var dbAppUser = await _userRepository.Get(Id);
                 if (dbAppUser == null)
-                    return NotFound($"AppUser{nameof(Id)} : {Id + ErrorMessages.DoesNotExist}");
+                    return NotFound($"{nameof(AppUser)} {nameof(Id)} '{Id}' {ErrorMessages.DoesNotExist}");
 
                 dbAppUser.IsActive = true;
 
@@ -170,11 +169,17 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (Id <= 0)
-                    return BadRequest($"AppUser{nameof(Id) + ErrorMessages.LessThenZero}");
+                    return BadRequest($"{nameof(AppUser)} {nameof(Id) + ErrorMessages.LessThenZero}");
 
                 var dbAppUser = await _userRepository.Get(Id);
                 if (dbAppUser == null)
-                    return NotFound($"AppUser{nameof(Id)} : {Id + ErrorMessages.DoesNotExist}");
+                    return NotFound($"{nameof(AppUser)} {nameof(Id)} '{Id}' {ErrorMessages.DoesNotExist}");
+
+                var shoppingCart = _cartRepository.GetAll()
+                                                  .Where(cart => cart.AppUserId == Id)
+                                                  .FirstOrDefault();
+                if (shoppingCart != null)
+                    return BadRequest($"{nameof(AppUser)} with {nameof(Id)} : {Id} {ErrorMessages.PendingItemsInCart}");
 
                 dbAppUser.IsActive = false;
                 await _context.SaveChangesAsync();

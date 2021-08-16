@@ -13,9 +13,9 @@ namespace OrganicShopAPI.DataAccess
             _context = context;
         }
 
-        public IEnumerable<TEntity> GetAll()
+        public IQueryable<TEntity> GetAll()
         {
-            return _context.Set<TEntity>().ToList();
+            return _context.Set<TEntity>();
         }
 
         public async Task<TEntity> Get(int id)
@@ -23,11 +23,14 @@ namespace OrganicShopAPI.DataAccess
             return await _context.Set<TEntity>().FindAsync(id);
         }
 
-
         public async Task Add(TEntity tEntity)
         {
             await _context.Set<TEntity>().AddAsync(tEntity);
         }
 
+        public void Delete(TEntity tEntity)
+        {
+             _context.Set<TEntity>().Remove(tEntity);
+        }
     }
 }

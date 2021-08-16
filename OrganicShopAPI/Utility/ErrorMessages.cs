@@ -12,6 +12,9 @@ namespace OrganicShopAPI.Utility
         public const string InvalidURL = " is not a valid URL.";
         public const string InvalidEmail = " is not a valid Email Address.";
         public const string DoesNotExist = " does not exist.";
+        public const string ShoppingCartItemsMissing = " shopping cart items missing.";
         public const string NullParameter = " parameter cannot be null.";
+        public const string PendingItemsInCart = " cannot be decativated since User has some items in the shopping cart.";
+        public const string NoRecordFound = "No matching record found";
     }
 }

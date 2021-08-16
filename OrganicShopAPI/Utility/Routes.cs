@@ -14,5 +14,6 @@ namespace OrganicShopAPI.Utility
         public const string Deactivate = "Deactivate/{Id}";
         public const string Activate = "Activate/{Id}";
         public const string Id = "{Id}";
+        public const string UserId = "User/{Id}";
     }
 }

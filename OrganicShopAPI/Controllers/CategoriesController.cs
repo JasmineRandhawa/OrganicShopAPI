@@ -33,20 +33,15 @@ namespace OrganicShopAPI.Controllers
         [Route(Routes.All)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Category>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetAll()
         {
             try
             {
                 var categories = _categoryRepository.GetAll()
-                                                 .ToList();
-                                                 
-                if (categories != null)
-                    return categories.Count > 0 ? Ok(categories.OrderByDescending(category => category.IsActive)) 
-                                                : NoContent();
+                                                 .OrderByDescending(category => category.IsActive);
 
-                return NotFound();
+                return (categories != null && categories.Count() > 0) ? Ok(categories.ToList()) : NoContent();
             }
             catch(Exception)
             {
@@ -71,7 +66,7 @@ namespace OrganicShopAPI.Controllers
                 if(category != null)
                     return Ok(category);
 
-                return NotFound($" Category{nameof(Id)} : {Id + ErrorMessages.DoesNotExist}");
+                return NotFound($"{nameof(Category)}{nameof(Id)} '{Id}' {ErrorMessages.DoesNotExist}");
             }
             catch (Exception)
             {
@@ -119,7 +114,7 @@ namespace OrganicShopAPI.Controllers
 
                 var dbCategory = await _categoryRepository.Get(category.Id);
                 if (dbCategory == null)
-                    return NotFound($" Category{nameof(category.Id)} : {category.Id + ErrorMessages.DoesNotExist}");
+                    return NotFound($"{nameof(Category)}{nameof(category.Id)} '{category.Id}' {ErrorMessages.DoesNotExist}");
 
                 dbCategory.Name = category.Name;
                 dbCategory.IsActive = category.IsActive;
@@ -143,11 +138,11 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (Id <= 0)
-                    return BadRequest($"Category{nameof(Id) + ErrorMessages.LessThenZero}");
+                    return BadRequest($"{nameof(Category)}{nameof(Id) + ErrorMessages.LessThenZero}");
 
                 var dbCategory = await _categoryRepository.Get(Id);
                 if (dbCategory == null)
-                    return NotFound($"Category{nameof(Id)} : {Id + ErrorMessages.DoesNotExist}");
+                    return NotFound($"{nameof(Category)}{nameof(Id)} '{Id}' {ErrorMessages.DoesNotExist}");
 
                 dbCategory.IsActive = true;
 
@@ -170,11 +165,11 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (Id <= 0)
-                    return BadRequest($"Category{nameof(Id) + ErrorMessages.LessThenZero}");
+                    return BadRequest($"{nameof(Category)}{nameof(Id) + ErrorMessages.LessThenZero}");
 
                 var dbCategory = await _categoryRepository.Get(Id);
                 if (dbCategory == null)
-                    return NotFound($"Category{nameof(Id)} : {Id + ErrorMessages.DoesNotExist}");
+                    return NotFound($"{nameof(Category)}{nameof(Id)} '{Id}' {ErrorMessages.DoesNotExist}");
 
                 dbCategory.IsActive = false;
                 await _context.SaveChangesAsync();

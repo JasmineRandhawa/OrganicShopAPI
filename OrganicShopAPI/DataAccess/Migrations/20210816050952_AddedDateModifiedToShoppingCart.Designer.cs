@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OrganicShopAPI.DataAccess;
 
 namespace OrganicShopAPI.Migrations
 {
     [DbContext(typeof(OrganicShopDbContext))]
-    partial class OrganicShopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210816050952_AddedDateModifiedToShoppingCart")]
+    partial class AddedDateModifiedToShoppingCart
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -197,13 +199,13 @@ namespace OrganicShopAPI.Migrations
 
             modelBuilder.Entity("OrganicShopAPI.Models.ShoppingCart", b =>
                 {
-                    b.HasOne("OrganicShopAPI.Models.AppUser", "AppUser")
+                    b.HasOne("OrganicShopAPI.Models.AppUser", "User")
                         .WithMany()
                         .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AppUser");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("OrganicShopAPI.Models.ShoppingCartItem", b =>

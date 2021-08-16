@@ -18,13 +18,14 @@ content-type: application/json
 }
 
 ### Update User
-PUT https://localhost:5001/Api/Users/Update HTTP/1.1
+PATCH https://localhost:5001/Api/Users/Update HTTP/1.1
 content-type: application/json
 
 {
     "Id" : 1,
     "Name" : "Jasmine Randhawa",
     "Email" : "jasminerandhawa@abc.com",
+    "IsAdmin" : true
 }
 
 ### Deactivate User
@@ -97,7 +98,7 @@ content-type: application/json
 
 {
     "Id" : 1,
-    "Title" : "Apple",
+    "Title" : "Green Apple",
     "ImageURL" : "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/199px-Red_Apple.jpg",
     "CategoryId" : 1,
     "IsActive" : false
@@ -109,4 +110,50 @@ content-type: application/json
 
 ### Activate Product
 PATCH https://localhost:5001/Api/Products/Activate/1 HTTP/1.1
+content-type: application/json
+
+###---------------------------------------------------------------------------------
+### GetByUser ShoppingCart
+GET https://localhost:5001/Api/ShoppingCart/User/1 HTTP/1.1
+content-type: application/json
+
+### GetById ShoppingCart
+GET https://localhost:5001/Api/ShoppingCart/1 HTTP/1.1
+content-type: application/json
+
+### Add ShoppingCart
+POST https://localhost:5001/Api/ShoppingCart/Add HTTP/1.1
+content-type: application/json
+
+{
+    "AppUserId" : 1,
+    "Items" : [
+        {
+            "ProductId" : 1,
+            "Quantity" : 2
+        }
+    ]
+}
+
+### Update ShoppingCart
+PATCH https://localhost:5001/Api/ShoppingCart/Update HTTP/1.1
+content-type: application/json
+
+{
+    "Id" : 1,
+    "AppUserId" : 1,
+    "Items" : [
+        {
+            "ProductId" : 1,
+            "Quantity" : 2
+        },
+        {
+            "ProductId" : 2,
+            "Quantity" : 3
+        }
+    ]
+}
+
+### Delete ShoppingCart
+DELETE https://localhost:5001/Api/ShoppingCart/1 HTTP/1.1
 content-type: application/json

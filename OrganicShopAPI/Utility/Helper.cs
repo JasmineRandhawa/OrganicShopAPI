@@ -11,7 +11,8 @@ namespace OrganicShopAPI.Utility
         public static bool IsURLValid(this string source)
         {
             Uri uriResult;
-            return Uri.TryCreate(source, UriKind.Absolute, out uriResult) && uriResult.Scheme == Uri.UriSchemeHttp;
+            return Uri.TryCreate(source, UriKind.Absolute, out uriResult) && 
+                  (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
         }
 
         public static bool IsValidEmail(this string email)

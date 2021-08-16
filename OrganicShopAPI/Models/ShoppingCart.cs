@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace OrganicShopAPI.Models
 {
@@ -9,11 +11,12 @@ namespace OrganicShopAPI.Models
 
         public IEnumerable<ShoppingCartItem> Items { get; set; } = new List<ShoppingCartItem>();
 
-        public AppUser User { get; set; }
+        public AppUser AppUser { get; set; }
 
         public int AppUserId { get; set; }
 
         public string DateCreated { get; set; }
 
+        public string DateModified { get; set; }
     }
 }

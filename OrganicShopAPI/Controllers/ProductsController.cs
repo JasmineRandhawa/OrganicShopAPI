@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OrganicShopAPI.DataAccess;
+using OrganicShopAPI.DataTransferObjects;
 using OrganicShopAPI.Models;
 using OrganicShopAPI.Utility;
 using System;
@@ -34,29 +36,26 @@ namespace OrganicShopAPI.Controllers
 
         [HttpGet]
         [Route(Routes.All)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Product>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProductDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetAll()
         {
             try
             {
                 var products = _productRepository.GetAll()
+                                                 .Include(product=> product.Category)
+                                                 .OrderByDescending(product => product.IsActive)
                                                  .ToList();
-                                                 
-                if (products != null)
-                    return products.Count > 0 ? Ok(products.OrderByDescending(product => product.IsActive)) 
-                                              : NoContent();
 
-                return NotFound();
+                return (products != null && products.Count > 0 ) ? Ok(ConstructProductsResponse(products)) 
+                                                                 : NoContent();
             }
             catch(Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-
 
         [HttpGet(Routes.Id)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Product))]
@@ -70,11 +69,11 @@ namespace OrganicShopAPI.Controllers
                 if (Id <= 0)
                     return BadRequest(nameof(Id) + ErrorMessages.LessThenZero);
 
-                var product = await _productRepository.Get(Id);
-                if(product!=null)
-                    return Ok(product);
+                var product = await GetProductById(Id);
+                if (product == null)
+                    return NotFound($"{nameof(Product)}{nameof(Id)} '{Id}' {ErrorMessages.DoesNotExist}");
 
-                return NotFound($" Product{nameof(Id)} : {Id + ErrorMessages.DoesNotExist}");
+                return Ok(ConstructProductResponse(product));
             }
             catch (Exception)
             {
@@ -97,7 +96,7 @@ namespace OrganicShopAPI.Controllers
 
                 await _productRepository.Add(product);
                 await _context.SaveChangesAsync();
-                var dbProduct = await _productRepository.Get(product.Id);
+                var dbProduct = await GetProductById(product.Id);
                 return Created("", dbProduct);
             }
             catch (Exception)
@@ -120,14 +119,13 @@ namespace OrganicShopAPI.Controllers
                 if (!string.IsNullOrWhiteSpace(checkInputErrorMessage))
                     return BadRequest(checkInputErrorMessage);
 
-                var dbProduct = await _productRepository.Get(product.Id);
+                var dbProduct = await GetProductById(product.Id);
                 if (dbProduct == null)
-                    return NotFound($" Product{nameof(product.Id)} : {product.Id + ErrorMessages.DoesNotExist}");
+                    return NotFound($"{nameof(Product)}{nameof(product.Id)} '{product.Id}' {ErrorMessages.DoesNotExist}");
 
                 dbProduct.Title = product.Title;
                 dbProduct.ImageURL = product.ImageURL;
                 dbProduct.CategoryId = product.CategoryId;
-                dbProduct.IsActive = product.IsActive;
 
                 await _context.SaveChangesAsync();
                 return Ok(dbProduct);
@@ -148,11 +146,11 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (Id <= 0)
-                    return BadRequest($"Product{nameof(Id) + ErrorMessages.LessThenZero}");
+                    return BadRequest($"{nameof(Product)}{nameof(Id) + ErrorMessages.LessThenZero}");
 
-                var dbProduct = await _productRepository.Get(Id);
+                var dbProduct = await GetProductById(Id);
                 if (dbProduct == null)
-                    return NotFound($"Product{nameof(Id)} : {Id + ErrorMessages.DoesNotExist}");
+                    return NotFound($"{nameof(Product)}{nameof(Id)} '{Id}' {ErrorMessages.DoesNotExist}");
 
                 dbProduct.IsActive = true;
                 await _context.SaveChangesAsync();
@@ -174,11 +172,11 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (Id <= 0)
-                    return BadRequest($"Product{nameof(Id) + ErrorMessages.LessThenZero}");
+                    return BadRequest($"{nameof(Product)}{nameof(Id) + ErrorMessages.LessThenZero}");
 
-                var dbProduct = await _productRepository.Get(Id);
+                var dbProduct = await GetProductById(Id);
                 if (dbProduct == null)
-                    return NotFound($"Product{nameof(Id)} : {Id + ErrorMessages.DoesNotExist}");
+                    return NotFound($"{nameof(Product)}{nameof(Id)} '{Id}' {ErrorMessages.DoesNotExist}");
 
                 dbProduct.IsActive = false;
                 await _context.SaveChangesAsync();
@@ -219,11 +217,35 @@ namespace OrganicShopAPI.Controllers
             if (product.CategoryId < 0 )
                 errorMessage += nameof(product.CategoryId) + ErrorMessages.EmptyOrWhiteSpace;;
             if (product.CategoryId > 0 && await _categoryRepository.Get(product.CategoryId) == null)
-                errorMessage += $" {nameof(product.CategoryId)} : {product.CategoryId + ErrorMessages.DoesNotExist}";
+                errorMessage += $" {nameof(product.CategoryId)} '{product.CategoryId}' {ErrorMessages.DoesNotExist}";
 
             return errorMessage;
         }
 
+        #endregion
+
+        #region "Products Private Methods"
+        private IEnumerable<ProductDto> ConstructProductsResponse(List<Product> products)
+        {
+            foreach (var product in products)
+                yield return ConstructProductResponse(product);
+        }
+
+        private ProductDto ConstructProductResponse(Product product)
+        {
+            return new ProductDto{Title = product.Title,
+                                  Category = product.Category.Name,
+                                  ImageURL = product.ImageURL
+                                 };
+        }
+
+        private async Task<Product> GetProductById(int Id)
+        {
+            return await _productRepository.GetAll()
+                                                 .Where(product => product.Id == Id)
+                                                 .Include(product => product.Category)
+                                                 .FirstOrDefaultAsync();
+        }
         #endregion
     }
 }
