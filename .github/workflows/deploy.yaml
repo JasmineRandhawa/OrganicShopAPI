@@ -34,10 +34,14 @@ jobs:
       - name : Build App
         run : dotnet build -c Release --no-restore
 
+      - name: Restore donettool
+        run: dotnet tool install --global dotnet-ef
+
+      - name: update database
+        run: dotnet-ef database update --no-build
+
       - name : Run Automated Tests
-        env : 
-          ConnectionStrings__DefaultConnection : Server=localhost;Database=OrganicShop_Test;User=jasmine;Password=Goodwish@55!
-        run : dotnet test -c Release --no-build
+        run : dotnet test -c Release --no-build --verbosity normal
 
       - name : Publish app
         run : dotnet publish -c Release -o ./out
