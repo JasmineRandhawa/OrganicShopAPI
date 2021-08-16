@@ -34,14 +34,6 @@ jobs:
       - name : Build App
         run : dotnet build -c Release --no-restore
 
-      - name: Restore donettool
-        run: dotnet tool install --global dotnet-ef
-        working-directory: ./OrganicShopAPI
-
-      - name: update database
-        run: dotnet-ef database update --no-build
-        working-directory: ./OrganicShopAPI
-
       - name : Run Automated Tests
         run : dotnet test -c Release --no-build --verbosity normal  
 
