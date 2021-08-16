@@ -21,7 +21,7 @@ jobs:
           dotnet-version : ${{env.DOT_NET_VERSION}}
 
       - name : Start SQL Server
-        run : docker run -d -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Goodwish55' -e 'MYSQL_PID=Express' -p 1433:1433 -d mcr.microsoft.com/mssql/server:latest  
+        run : docker run -d -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Goodwish@55!' -e 'MYSQL_PID=Express' -p 1433:1433 -d mcr.microsoft.com/mssql/server:latest  
 
       - name : Sleep for 5 sec
         uses : jakejarvis/wait-action@master
@@ -36,7 +36,7 @@ jobs:
 
       - name : Run Automated Tests
         env : 
-          ConnectionStrings__DefaultConnection : Server=localhost,1433;Database=OrganicShop_Test;User=sa;Password=Goodwish55;MultipleActiveResultSets=True;
+          ConnectionStrings__DefaultConnection : Server=localhost;Database=OrganicShop_Test;User=sa;Password=Goodwish@55!
         run : dotnet test -c Release --no-build
 
       - name : Publish app
