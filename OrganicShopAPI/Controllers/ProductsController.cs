@@ -1,15 +1,18 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.EntityFrameworkCore;
+
+using OrganicShopAPI.Constants;
 using OrganicShopAPI.DataAccess;
 using OrganicShopAPI.Models;
 using OrganicShopAPI.Utility;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace OrganicShopAPI.Controllers
 {
@@ -60,7 +63,7 @@ namespace OrganicShopAPI.Controllers
         {
             try
             {
-                var checkInputErrorMessage = await ValidateProductInputAsync(product,Utility.Action.Add);
+                var checkInputErrorMessage = await ValidateProductInputAsync(product, Constants.Action.Add);
 
                 if (!string.IsNullOrWhiteSpace(checkInputErrorMessage))
                     return BadRequest(checkInputErrorMessage);
@@ -85,7 +88,7 @@ namespace OrganicShopAPI.Controllers
         {
             try
             {
-                var checkInputErrorMessage = await ValidateProductInputAsync(product, Utility.Action.Update);
+                var checkInputErrorMessage = await ValidateProductInputAsync(product, Constants.Action.Update);
 
                 if (!string.IsNullOrWhiteSpace(checkInputErrorMessage))
                     return BadRequest(checkInputErrorMessage);
@@ -162,7 +165,7 @@ namespace OrganicShopAPI.Controllers
         #endregion
 
         #region "Validation Methods"
-        private async Task<string> ValidateProductInputAsync(Product product, Utility.Action action)
+        private async Task<string> ValidateProductInputAsync(Product product, Constants.Action action)
         {
             string errorMessage = string.Empty;
 
@@ -171,7 +174,7 @@ namespace OrganicShopAPI.Controllers
                 return nameof(product) + ErrorMessages.NullParameter;
 
             // Id validation on update operation
-            if (product.Id <= 0 && action == Utility.Action.Update)
+            if (product.Id <= 0 && action == Constants.Action.Update)
                 return nameof(product.Id) + ErrorMessages.LessThenZero;
 
             // Title validation

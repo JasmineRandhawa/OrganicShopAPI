@@ -5,6 +5,9 @@ on:
     branches:
       - master
 
+env:
+  DOT_NET_VERSION : '5.0.x'
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,10 +18,26 @@ jobs:
       - name : Set Up .Net 5 
         uses : actions/setup-dotnet@v1
         with : 
-          dotnet-version : '5.0.x'
+          dotnet-version : ${{env.DOT_NET_VERSION}}
+
+      - name : Start SQL Server
+        run : docker run -d -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Goodwish55' -e 'MYSQL_PID=Express' -p 1433:1433 -d mcr.microsoft.com/mssql/server:latest  
+
+      - name : Sleep for 5 sec
+        uses : jakejarvis/wait-action@master
+        with:
+            time : '5s' 
 
       - name : Restore Dependencies
         run : dotnet restore
 
       - name : Build App
         run : dotnet build -c Release --no-restore
+
+      - name : Run Automated Tests
+        env : 
+          ConnectionStrings__DefaultConnection : Server=localhost;Database=OrganicShop_Test;User=sa;Password=Goodwish55
+        run : dotnet test -c Release --no-build
+
+      - name : Publish app
+        run : dotnet publish -c Release -o ./out

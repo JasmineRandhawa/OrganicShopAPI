@@ -1,14 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using OrganicShopAPI.DataAccess;
-using OrganicShopAPI.DataTransferObjects;
-using OrganicShopAPI.Models;
-using OrganicShopAPI.Utility;
-using System;
+﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+using OrganicShopAPI.Constants;
+using OrganicShopAPI.DataAccess;
+using OrganicShopAPI.DataTransferObjects;
+using OrganicShopAPI.Models;
 
 namespace OrganicShopAPI.Controllers
 {
@@ -51,7 +53,7 @@ namespace OrganicShopAPI.Controllers
                 return Ok(ConstructShoppingCartResponse(shoppingCart));
                                         
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -91,7 +93,7 @@ namespace OrganicShopAPI.Controllers
         {
             try
             {
-                var checkInputErrorMessage = ValidateShoppingCartInput(shoppingCart,Utility.Action.Add);
+                var checkInputErrorMessage = ValidateShoppingCartInput(shoppingCart, Constants.Action.Add);
 
                 if (!string.IsNullOrWhiteSpace(checkInputErrorMessage))
                     return BadRequest(checkInputErrorMessage);
@@ -118,7 +120,7 @@ namespace OrganicShopAPI.Controllers
         {
             try
             {
-                var checkInputErrorMessage = ValidateShoppingCartInput(shoppingCart, Utility.Action.Update);
+                var checkInputErrorMessage = ValidateShoppingCartInput(shoppingCart, Constants.Action.Update);
 
                 if (!string.IsNullOrWhiteSpace(checkInputErrorMessage))
                     return BadRequest(checkInputErrorMessage);
@@ -168,7 +170,7 @@ namespace OrganicShopAPI.Controllers
         #endregion
 
         #region "Validation Methods"
-        private string ValidateShoppingCartInput(ShoppingCart shoppingCart, Utility.Action action)
+        private string ValidateShoppingCartInput(ShoppingCart shoppingCart, Constants.Action action)
         {
             string errorMessage = string.Empty;
 
@@ -177,7 +179,7 @@ namespace OrganicShopAPI.Controllers
                 return nameof(shoppingCart) + ErrorMessages.NullParameter;
 
             // Id validation on update operation
-            if (shoppingCart.Id <= 0 && action == Utility.Action.Update)
+            if (shoppingCart.Id <= 0 && action == Constants.Action.Update)
                 return nameof(shoppingCart.Id) + ErrorMessages.LessThenZero;
 
             // Items validation

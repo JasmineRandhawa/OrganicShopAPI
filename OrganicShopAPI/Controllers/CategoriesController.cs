@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
+
+using OrganicShopAPI.Constants;
 using OrganicShopAPI.DataAccess;
 using OrganicShopAPI.Models;
-using OrganicShopAPI.Utility;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace OrganicShopAPI.Controllers
 {
@@ -33,7 +34,7 @@ namespace OrganicShopAPI.Controllers
 
         [EnableQuery]
         [Route(Routes.All)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Category>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IQueryable<Category>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetAll()
@@ -56,7 +57,7 @@ namespace OrganicShopAPI.Controllers
         {
             try
             {
-                var checkInputErrorMessage = ValidateCategoryInput(category,Utility.Action.Add);
+                var checkInputErrorMessage = ValidateCategoryInput(category, Constants.Action.Add);
 
                 if (!string.IsNullOrWhiteSpace(checkInputErrorMessage))
                     return BadRequest(checkInputErrorMessage);
@@ -81,7 +82,7 @@ namespace OrganicShopAPI.Controllers
         {
             try
             {
-                var checkInputErrorMessage = ValidateCategoryInput(category, Utility.Action.Update);
+                var checkInputErrorMessage = ValidateCategoryInput(category, Constants.Action.Update);
 
                 if (!string.IsNullOrWhiteSpace(checkInputErrorMessage))
                     return BadRequest(checkInputErrorMessage);
@@ -158,7 +159,7 @@ namespace OrganicShopAPI.Controllers
         #endregion
 
         #region "Validation Methods"
-        private string ValidateCategoryInput(Category category, Utility.Action action)
+        private string ValidateCategoryInput(Category category, Constants.Action action)
         {
             string errorMessage = string.Empty;
 
@@ -167,7 +168,7 @@ namespace OrganicShopAPI.Controllers
                 return nameof(category) + ErrorMessages.NullParameter;
 
             // Id validation on update operation
-            if (category.Id <= 0 && action == Utility.Action.Update)
+            if (category.Id <= 0 && action == Constants.Action.Update)
                 return nameof(category.Id) + ErrorMessages.LessThenZero;
 
             // Name validation

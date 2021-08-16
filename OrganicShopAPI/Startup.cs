@@ -5,12 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OpenApi.Models;
+
 using OrganicShopAPI.DataAccess;
-using OrganicShopAPI.DataTransferObjects;
 using OrganicShopAPI.Models;
 
 namespace OrganicShopAPI

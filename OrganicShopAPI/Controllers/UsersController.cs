@@ -1,16 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
+
+using OrganicShopAPI.Constants;
 using OrganicShopAPI.DataAccess;
 using OrganicShopAPI.Models;
 using OrganicShopAPI.Utility;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-
 
 namespace OrganicShopAPI.Controllers
 {
@@ -59,7 +59,7 @@ namespace OrganicShopAPI.Controllers
         {
             try
             {
-                var checkInputErrorMessage = ValidateAppUserInput(user,Utility.Action.Add);
+                var checkInputErrorMessage = ValidateAppUserInput(user, Constants.Action.Add);
 
                 if (!string.IsNullOrWhiteSpace(checkInputErrorMessage))
                     return BadRequest(checkInputErrorMessage);
@@ -84,7 +84,7 @@ namespace OrganicShopAPI.Controllers
         {
             try
             {
-                var checkInputErrorMessage = ValidateAppUserInput(user, Utility.Action.Update);
+                var checkInputErrorMessage = ValidateAppUserInput(user, Constants.Action.Update);
 
                 if (!string.IsNullOrWhiteSpace(checkInputErrorMessage))
                     return BadRequest(checkInputErrorMessage);
@@ -168,7 +168,7 @@ namespace OrganicShopAPI.Controllers
         #endregion
 
         #region "Validation Methods"
-        private string ValidateAppUserInput(AppUser user, Utility.Action action)
+        private string ValidateAppUserInput(AppUser user, Constants.Action action)
         {
             string errorMessage = string.Empty;
 
@@ -177,7 +177,7 @@ namespace OrganicShopAPI.Controllers
                 return nameof(user) + ErrorMessages.NullParameter;
 
             // Id validation on update operation
-            if (user.Id <= 0 && action == Utility.Action.Update)
+            if (user.Id <= 0 && action == Constants.Action.Update)
                 return nameof(user.Id) + ErrorMessages.LessThenZero;
 
             // Name validation
