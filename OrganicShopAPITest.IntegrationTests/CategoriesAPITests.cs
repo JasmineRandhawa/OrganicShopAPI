@@ -33,8 +33,8 @@ namespace OrganicShopAPITest.IntegrationTests
 
             var context = new OrganicShopDbContext(optionsBuilder.Options);
 
-            await context.Database.EnsureDeletedAsync();
-            await context.Database.EnsureCreatedAsync();
+            //await context.Database.EnsureDeletedAsync();
+            //await context.Database.EnsureCreatedAsync();
 
             // Arrange
             var request = TestRoutes.AllCategories;
@@ -48,7 +48,7 @@ namespace OrganicShopAPITest.IntegrationTests
             Assert.NotNull(response);
             Assert.Equal(response.StatusCode,(HttpStatusCode) StatusCodes.Status200OK);
             Assert.NotNull(categories);
-            Assert.True(categories.Count() == 0);
+            Assert.True(categories.Count() > 0);
         }
     }
 }
