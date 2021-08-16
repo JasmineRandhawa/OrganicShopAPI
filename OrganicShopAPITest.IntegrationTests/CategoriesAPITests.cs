@@ -33,8 +33,6 @@ namespace OrganicShopAPITest.IntegrationTests
 
             var context = new OrganicShopDbContext(optionsBuilder.Options);
 
-            
-
             using (var dbContext = context)
             {
                 await dbContext.Database.EnsureDeletedAsync();
