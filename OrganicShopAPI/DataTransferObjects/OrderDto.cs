@@ -1,6 +1,6 @@
-﻿namespace OrganicShopAPI.Models
+﻿namespace OrganicShopAPI.DataTransferObjects
 {
-    public class Order
+    public class OrderDto
     {
         public int Id { get; set; }
 
@@ -8,9 +8,7 @@
 
         public string Address { get; set; }
 
-        public ShoppingCart ShoppingCart { get; set; }
-
-        public int ShoppingCartId { get; set; }
+        public ShoppingCartDto ShoppingCart { get; set; }
 
         public string DateCreated { get; set; }
     }

@@ -160,3 +160,28 @@ content-type: application/json
 ### Delete ShoppingCart
 DELETE https://localhost:5001/Api/ShoppingCart/1 HTTP/1.1
 content-type: application/json
+
+###---------------------------------------------------------------------------------
+### GetAll Orders By User
+GET https://localhost:5001/Api/Orders/User/1 HTTP/1.1
+content-type: application/json
+
+### GetById Order By Id
+GET https://localhost:5001/Api/Orders/1 HTTP/1.1
+content-type: application/json
+
+### Add Order
+POST https://localhost:5001/Api/Orders/Add HTTP/1.1
+content-type: application/json
+
+{
+    "ShoppingCartId" : 2,
+    "Name" :"Jasmine",
+    "Address" : "Alberta",
+    "AppUserId" : 1
+}
+
+### Delete Order
+DELETE https://localhost:5001/Api/Orders/1 HTTP/1.1
+content-type: application/json
+###---------------------------------------------------------------------------------

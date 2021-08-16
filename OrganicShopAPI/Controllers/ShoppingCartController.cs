@@ -183,7 +183,7 @@ namespace OrganicShopAPI.Controllers
                 return nameof(shoppingCart.Id) + ErrorMessages.LessThenZero;
 
             // Items validation
-            if (shoppingCart.Items==null || (shoppingCart.Items == null && shoppingCart.Items.Count() == 0))
+            if (shoppingCart.Items==null || (shoppingCart.Items != null && shoppingCart.Items.Count() == 0))
                 errorMessage += ErrorMessages.ShoppingCartItemsMissing;
 
             return errorMessage;
