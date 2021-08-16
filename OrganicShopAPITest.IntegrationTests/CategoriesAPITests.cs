@@ -33,8 +33,8 @@ namespace OrganicShopAPITest.IntegrationTests
 
             var context = new OrganicShopDbContext(optionsBuilder.Options);
 
-            //await context.Database.EnsureDeletedAsync();
-            //await context.Database.EnsureCreatedAsync();
+            await context.Database.EnsureDeletedAsync();
+            await context.Database.EnsureCreatedAsync();
 
             // Arrange
             var request = TestRoutes.AllCategories;
