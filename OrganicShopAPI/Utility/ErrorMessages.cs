@@ -10,6 +10,7 @@ namespace OrganicShopAPI.Utility
         public const string LessThenZero = " should be greater than 0.";
         public const string EmptyOrWhiteSpace = " cannot be empty string or white space.";
         public const string InvalidURL = " is not a valid URL.";
+        public const string InvalidEmail = " is not a valid Email Address.";
         public const string DoesNotExist = " does not exist.";
         public const string NullParameter = " parameter cannot be null.";
     }

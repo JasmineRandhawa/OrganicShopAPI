@@ -12,29 +12,26 @@ namespace OrganicShopAPI.Controllers
 {
     [ApiController]
     [Route(Routes.Controller)]
-    public class ProductsController : ControllerBase
+    public class CategoriesController : ControllerBase
     {
         #region "Declarations and Constructor"
 
         private readonly OrganicShopDbContext _context;
-        private readonly IRepository<Product> _productRepository;
         private readonly IRepository<Category> _categoryRepository;
 
-        public ProductsController(OrganicShopDbContext context, IRepository<Product> productRepository
-                                  , IRepository<Category> categoryRepository)
+        public CategoriesController(OrganicShopDbContext context,IRepository<Category> categoryRepository)
         {
             _context = context;
-            _productRepository = productRepository;
             _categoryRepository = categoryRepository;
         }
 
         #endregion
 
-        #region "Products API Public Methods"
+        #region "Categories API Public Methods"
 
         [HttpGet]
         [Route(Routes.All)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Product>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Category>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -42,12 +39,12 @@ namespace OrganicShopAPI.Controllers
         {
             try
             {
-                var products = _productRepository.GetAll()
+                var categories = _categoryRepository.GetAll()
                                                  .ToList();
                                                  
-                if (products != null)
-                    return products.Count > 0 ? Ok(products.OrderByDescending(product => product.IsActive)) 
-                                              : NoContent();
+                if (categories != null)
+                    return categories.Count > 0 ? Ok(categories.OrderByDescending(category => category.IsActive)) 
+                                                : NoContent();
 
                 return NotFound();
             }
@@ -59,7 +56,7 @@ namespace OrganicShopAPI.Controllers
 
 
         [HttpGet(Routes.Id)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Product))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Category))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -70,11 +67,11 @@ namespace OrganicShopAPI.Controllers
                 if (Id <= 0)
                     return BadRequest(nameof(Id) + ErrorMessages.LessThenZero);
 
-                var product = await _productRepository.Get(Id);
-                if(product!=null)
-                    return Ok(product);
+                var category = await _categoryRepository.Get(Id);
+                if(category != null)
+                    return Ok(category);
 
-                return NotFound($" Product{nameof(Id)} : {Id + ErrorMessages.DoesNotExist}");
+                return NotFound($" Category{nameof(Id)} : {Id + ErrorMessages.DoesNotExist}");
             }
             catch (Exception)
             {
@@ -83,22 +80,22 @@ namespace OrganicShopAPI.Controllers
         }
 
         [HttpPost(Routes.Add)]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Product))]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Category))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Add(Product product)
+        public async Task<IActionResult> Add(Category category)
         {
             try
             {
-                var checkInputErrorMessage = await ValidateProductInputAsync(product,Utility.Action.Add);
+                var checkInputErrorMessage = ValidateCategoryInput(category,Utility.Action.Add);
 
                 if (!string.IsNullOrWhiteSpace(checkInputErrorMessage))
                     return BadRequest(checkInputErrorMessage);
 
-                await _productRepository.Add(product);
+                await _categoryRepository.Add(category);
                 await _context.SaveChangesAsync();
-                var dbProduct = await _productRepository.Get(product.Id);
-                return Created("", dbProduct);
+                var dbCategory = await _categoryRepository.Get(category.Id);
+                return Created("", dbCategory);
             }
             catch (Exception)
             {
@@ -107,30 +104,28 @@ namespace OrganicShopAPI.Controllers
         }
 
         [HttpPut(Routes.Update)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Product))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Category))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Update(Product product)
+        public async Task<IActionResult> Update(Category category)
         {
             try
             {
-                var checkInputErrorMessage = await ValidateProductInputAsync(product, Utility.Action.Update);
+                var checkInputErrorMessage = ValidateCategoryInput(category, Utility.Action.Update);
 
                 if (!string.IsNullOrWhiteSpace(checkInputErrorMessage))
                     return BadRequest(checkInputErrorMessage);
 
-                var dbProduct = await _productRepository.Get(product.Id);
-                if (dbProduct == null)
-                    return NotFound($" Product{nameof(product.Id)} : {product.Id + ErrorMessages.DoesNotExist}");
+                var dbCategory = await _categoryRepository.Get(category.Id);
+                if (dbCategory == null)
+                    return NotFound($" Category{nameof(category.Id)} : {category.Id + ErrorMessages.DoesNotExist}");
 
-                dbProduct.Title = product.Title;
-                dbProduct.ImageURL = product.ImageURL;
-                dbProduct.CategoryId = product.CategoryId;
-                dbProduct.IsActive = product.IsActive;
+                dbCategory.Name = category.Name;
+                dbCategory.IsActive = category.IsActive;
 
                 await _context.SaveChangesAsync();
-                return Ok(dbProduct);
+                return Ok(dbCategory);
             }
             catch (Exception)
             {
@@ -139,7 +134,7 @@ namespace OrganicShopAPI.Controllers
         }
 
         [HttpPatch(Routes.Activate)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Product))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Category))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -148,15 +143,16 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (Id <= 0)
-                    return BadRequest($"Product{nameof(Id) + ErrorMessages.LessThenZero}");
+                    return BadRequest($"Category{nameof(Id) + ErrorMessages.LessThenZero}");
 
-                var dbProduct = await _productRepository.Get(Id);
-                if (dbProduct == null)
-                    return NotFound($"Product{nameof(Id)} : {Id + ErrorMessages.DoesNotExist}");
+                var dbCategory = await _categoryRepository.Get(Id);
+                if (dbCategory == null)
+                    return NotFound($"Category{nameof(Id)} : {Id + ErrorMessages.DoesNotExist}");
 
-                dbProduct.IsActive = true;
+                dbCategory.IsActive = true;
+
                 await _context.SaveChangesAsync();
-                return Ok(dbProduct);
+                return Ok(dbCategory);
             }
             catch (Exception)
             {
@@ -165,7 +161,7 @@ namespace OrganicShopAPI.Controllers
         }
 
         [HttpPatch(Routes.Deactivate)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Product))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Category))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -174,15 +170,15 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (Id <= 0)
-                    return BadRequest($"Product{nameof(Id) + ErrorMessages.LessThenZero}");
+                    return BadRequest($"Category{nameof(Id) + ErrorMessages.LessThenZero}");
 
-                var dbProduct = await _productRepository.Get(Id);
-                if (dbProduct == null)
-                    return NotFound($"Product{nameof(Id)} : {Id + ErrorMessages.DoesNotExist}");
+                var dbCategory = await _categoryRepository.Get(Id);
+                if (dbCategory == null)
+                    return NotFound($"Category{nameof(Id)} : {Id + ErrorMessages.DoesNotExist}");
 
-                dbProduct.IsActive = false;
+                dbCategory.IsActive = false;
                 await _context.SaveChangesAsync();
-                return Ok(dbProduct);
+                return Ok(dbCategory);
             }
             catch (Exception)
             {
@@ -193,33 +189,21 @@ namespace OrganicShopAPI.Controllers
         #endregion
 
         #region "Validation Methods"
-        private async Task<string> ValidateProductInputAsync(Product product, Utility.Action action)
+        private string ValidateCategoryInput(Category category, Utility.Action action)
         {
             string errorMessage = string.Empty;
 
-            // product parameter validation
-            if (product==null)
-                return nameof(product) + ErrorMessages.NullParameter;
+            // category parameter validation
+            if (category == null)
+                return nameof(category) + ErrorMessages.NullParameter;
 
             // Id validation on update operation
-            if (product.Id <= 0 && action == Utility.Action.Update)
-                return nameof(product.Id) + ErrorMessages.LessThenZero;
+            if (category.Id <= 0 && action == Utility.Action.Update)
+                return nameof(category.Id) + ErrorMessages.LessThenZero;
 
-            // Title validation
-            if (string.IsNullOrWhiteSpace(product.Title))
-                errorMessage += nameof(product.Title) + ErrorMessages.EmptyOrWhiteSpace;
-
-            // ImageURL validations
-            if (string.IsNullOrWhiteSpace(product.ImageURL))
-                errorMessage += nameof(product.ImageURL) + ErrorMessages.EmptyOrWhiteSpace;
-            if (!string.IsNullOrWhiteSpace(product.ImageURL) && !product.ImageURL.IsURLValid())
-                errorMessage += nameof(product.ImageURL) + ErrorMessages.InvalidURL;
-
-            // CategoryId validations
-            if (product.CategoryId < 0 )
-                errorMessage += nameof(product.CategoryId) + ErrorMessages.EmptyOrWhiteSpace;;
-            if (product.CategoryId > 0 && await _categoryRepository.Get(product.CategoryId) == null)
-                errorMessage += $" {nameof(product.CategoryId)} : {product.CategoryId + ErrorMessages.DoesNotExist}";
+            // Name validation
+            if (string.IsNullOrWhiteSpace(category.Name))
+                errorMessage += nameof(category.Name) + ErrorMessages.EmptyOrWhiteSpace;
 
             return errorMessage;
         }

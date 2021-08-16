@@ -1,11 +1,77 @@
+### GetAll Users
+GET https://localhost:5001/Api/Users/All HTTP/1.1
+content-type: application/json
+
+### GetById User
+GET https://localhost:5001/Api/Users/1 HTTP/1.1
+content-type: application/json
+
+### Add User
+POST https://localhost:5001/Api/Users/Add HTTP/1.1
+content-type: application/json
+
+{
+    "Name" : "Jasmine",
+    "Email" : "jasmine@abc.com",
+    "IsAdmin" : false,
+    "IsActive" : false
+}
+
+### Update User
+PUT https://localhost:5001/Api/Users/Update HTTP/1.1
+content-type: application/json
+
+{
+    "Id" : 1,
+    "Name" : "Jasmine Randhawa",
+    "Email" : "jasminerandhawa@abc.com",
+}
+
+### Deactivate User
+PATCH https://localhost:5001/Api/Users/Deactivate/1 HTTP/1.1
+content-type: application/json
+
+### Activate User
+PATCH https://localhost:5001/Api/Users/Activate/1 HTTP/1.1
+content-type: application/json
+
+###---------------------------------------------------------------------------------
 ### GetAll Categories
 GET https://localhost:5001/Api/Categories/All HTTP/1.1
 content-type: application/json
 
 ### GetById Category
-GET https://localhost:5001/Api/Categories/1 HTTP/1.1
+GET https://localhost:5001/Api/Categories/8 HTTP/1.1
 content-type: application/json
 
+### Add Category
+POST https://localhost:5001/Api/Categories/Add HTTP/1.1
+content-type: application/json
+
+{
+    "Name" : "SeaFood",
+    "IsActive" : false
+}
+
+### Update Category
+PUT https://localhost:5001/Api/Categories/Update HTTP/1.1
+content-type: application/json
+
+{
+    "Id" : 8,
+    "Name" : "SeaFood and Fish",
+    "IsActive" : true
+}
+
+### Deactivate Category
+PATCH https://localhost:5001/Api/Categories/Deactivate/8 HTTP/1.1
+content-type: application/json
+
+### Activate Category
+PATCH https://localhost:5001/Api/Categories/Activate/8 HTTP/1.1
+content-type: application/json
+
+###---------------------------------------------------------------------------------
 ### GetAll Products
 GET https://localhost:5001/Api/Products/All HTTP/1.1
 content-type: application/json
@@ -19,8 +85,8 @@ POST https://localhost:5001/Api/Products/Add HTTP/1.1
 content-type: application/json
 
 {
-    "Title": "Bread",
-    "ImageURL": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/199px-Red_Apple.jpg",
+    "Title" : "Bread",
+    "ImageURL" : "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/199px-Red_Apple.jpg",
     "CategoryId" : 1,
     "IsActive" : true
 }
@@ -31,8 +97,8 @@ content-type: application/json
 
 {
     "Id" : 1,
-    "Title": "Apple",
-    "ImageURL": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/199px-Red_Apple.jpg",
+    "Title" : "Apple",
+    "ImageURL" : "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/199px-Red_Apple.jpg",
     "CategoryId" : 1,
     "IsActive" : false
 }
