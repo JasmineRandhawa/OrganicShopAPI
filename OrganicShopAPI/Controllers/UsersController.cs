@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using OrganicShopAPI.DataAccess;
 using OrganicShopAPI.Models;
 using OrganicShopAPI.Utility;
@@ -14,7 +16,7 @@ namespace OrganicShopAPI.Controllers
 {
     [ApiController]
     [Route(Routes.Controller)]
-    public class UsersController : ControllerBase
+    public class UsersController : ODataController
     {
         #region "Declarations and Constructor"
 
@@ -33,45 +35,17 @@ namespace OrganicShopAPI.Controllers
 
         #region "users API Public Methods"
 
-        [HttpGet]
+        [EnableQuery]
         [Route(Routes.All)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<AppUser>))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IQueryable<AppUser>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult GetAll()
+        public IActionResult Get()
         {
             try
             {
-                var users = _userRepository.GetAll();
-
-                return (users != null && users.Count() > 0) ? Ok(users.ToList()) : NoContent();
+                return Ok(_userRepository.GetAll());
             }
             catch(Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-
-        [HttpGet(Routes.Id)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AppUser))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Get(int Id)
-        {
-            try
-            {
-                if (Id <= 0)
-                    return BadRequest(nameof(Id) + ErrorMessages.LessThenZero);
-
-                var user = await _userRepository.Get(Id);
-                if(user != null)
-                    return Ok(user);
-
-                return NotFound($"{nameof(AppUser)} {nameof(Id)} '{Id}' {ErrorMessages.DoesNotExist}");
-            }
-            catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }

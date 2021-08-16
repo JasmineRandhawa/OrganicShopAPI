@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using OrganicShopAPI.DataAccess;
 using OrganicShopAPI.Models;
 using OrganicShopAPI.Utility;
@@ -12,7 +14,7 @@ namespace OrganicShopAPI.Controllers
 {
     [ApiController]
     [Route(Routes.Controller)]
-    public class CategoriesController : ControllerBase
+    public class CategoriesController : ODataController
     {
         #region "Declarations and Constructor"
 
@@ -29,7 +31,7 @@ namespace OrganicShopAPI.Controllers
 
         #region "Categories API Public Methods"
 
-        [HttpGet]
+        [EnableQuery]
         [Route(Routes.All)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Category>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -38,37 +40,9 @@ namespace OrganicShopAPI.Controllers
         {
             try
             {
-                var categories = _categoryRepository.GetAll()
-                                                 .OrderByDescending(category => category.IsActive);
-
-                return (categories != null && categories.Count() > 0) ? Ok(categories.ToList()) : NoContent();
+                return Ok(_categoryRepository.GetAll());
             }
             catch(Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-
-        [HttpGet(Routes.Id)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Category))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Get(int Id)
-        {
-            try
-            {
-                if (Id <= 0)
-                    return BadRequest(nameof(Id) + ErrorMessages.LessThenZero);
-
-                var category = await _categoryRepository.Get(Id);
-                if(category != null)
-                    return Ok(category);
-
-                return NotFound($"{nameof(Category)}{nameof(Id)} '{Id}' {ErrorMessages.DoesNotExist}");
-            }
-            catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }

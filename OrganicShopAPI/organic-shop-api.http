@@ -1,9 +1,10 @@
-### GetAll Users
+### GetAll Categories
 GET https://localhost:5001/Api/Users/All HTTP/1.1
 content-type: application/json
 
-### GetById User
-GET https://localhost:5001/Api/Users/1 HTTP/1.1
+### GetAll User OData
+GET https://localhost:5001/Api/Users/All?$filter=Id eq 3
+& $select=Name,Email HTTP/1.1
 content-type: application/json
 
 ### Add User
@@ -41,8 +42,9 @@ content-type: application/json
 GET https://localhost:5001/Api/Categories/All HTTP/1.1
 content-type: application/json
 
-### GetById Category
-GET https://localhost:5001/Api/Categories/8 HTTP/1.1
+### GetAll Categorie OData
+GET https://localhost:5001/Api/Categories/All?$filter=Id eq 1
+& $select=Name,IsActive HTTP/1.1
 content-type: application/json
 
 ### Add Category
@@ -77,8 +79,9 @@ content-type: application/json
 GET https://localhost:5001/Api/Products/All HTTP/1.1
 content-type: application/json
 
-### GetById Product
-GET https://localhost:5001/Api/Products/1 HTTP/1.1
+### GetAll Product OData
+GET https://localhost:5001/Api/Products/All?$filter=Id eq 1
+& $select=Title,ImageURL HTTP/1.1
 content-type: application/json
 
 ### Add Product
@@ -113,11 +116,11 @@ PATCH https://localhost:5001/Api/Products/Activate/1 HTTP/1.1
 content-type: application/json
 
 ###---------------------------------------------------------------------------------
-### GetByUser ShoppingCart
+### GetAll ShoppingCart By User
 GET https://localhost:5001/Api/ShoppingCart/User/1 HTTP/1.1
 content-type: application/json
 
-### GetById ShoppingCart
+### GetById ShoppingCart By Id
 GET https://localhost:5001/Api/ShoppingCart/2 HTTP/1.1
 content-type: application/json
 

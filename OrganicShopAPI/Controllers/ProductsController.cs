@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.EntityFrameworkCore;
 using OrganicShopAPI.DataAccess;
-using OrganicShopAPI.DataTransferObjects;
 using OrganicShopAPI.Models;
 using OrganicShopAPI.Utility;
 using System;
@@ -14,7 +15,7 @@ namespace OrganicShopAPI.Controllers
 {
     [ApiController]
     [Route(Routes.Controller)]
-    public class ProductsController : ControllerBase
+    public class ProductsController : ODataController
     {
         #region "Declarations and Constructor"
 
@@ -34,48 +35,18 @@ namespace OrganicShopAPI.Controllers
 
         #region "Products API Public Methods"
 
-        [HttpGet]
+        [EnableQuery]
         [Route(Routes.All)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ProductDto>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Product>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetAll()
         {
             try
             {
-                var products = _productRepository.GetAll()
-                                                 .Include(product=> product.Category)
-                                                 .OrderByDescending(product => product.IsActive)
-                                                 .ToList();
-
-                return (products != null && products.Count > 0 ) ? Ok(ConstructProductsResponse(products)) 
-                                                                 : NoContent();
+                return Ok(_productRepository.GetAll());
             }
             catch(Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-        [HttpGet(Routes.Id)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Product))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Get(int Id)
-        {
-            try
-            {
-                if (Id <= 0)
-                    return BadRequest(nameof(Id) + ErrorMessages.LessThenZero);
-
-                var product = await GetProductById(Id);
-                if (product == null)
-                    return NotFound($"{nameof(Product)}{nameof(Id)} '{Id}' {ErrorMessages.DoesNotExist}");
-
-                return Ok(ConstructProductResponse(product));
-            }
-            catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -225,19 +196,6 @@ namespace OrganicShopAPI.Controllers
         #endregion
 
         #region "Products Private Methods"
-        private IEnumerable<ProductDto> ConstructProductsResponse(List<Product> products)
-        {
-            foreach (var product in products)
-                yield return ConstructProductResponse(product);
-        }
-
-        private ProductDto ConstructProductResponse(Product product)
-        {
-            return new ProductDto{Title = product.Title,
-                                  Category = product.Category.Name,
-                                  ImageURL = product.ImageURL
-                                 };
-        }
 
         private async Task<Product> GetProductById(int Id)
         {
