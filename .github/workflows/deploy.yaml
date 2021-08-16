@@ -1,0 +1,24 @@
+name : Organic Shop API Continous Integration and Continous Deployment
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name : Checkout Code
+        uses : actions/checkout@v2
+
+      - name : Set Up .Net 5 
+        uses : actions/setup-dotnet@v1
+        with : 
+        dotnet-version : '5.0.x'
+
+      - name : Restore Dependencies
+        uses: dotnet restore
+
+      - name : Build App
+        uses: dotnet build -c Release --no-restore
