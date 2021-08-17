@@ -176,8 +176,8 @@ content-type: application/json
 
 {
     "ShoppingCartId" : 2,
-    "Name" :"Jasmine",
-    "Address" : "Alberta",
+    "UserName" :"Jasmine",
+    "Address" : "Edmonton",
     "AppUserId" : 1
 }
 
