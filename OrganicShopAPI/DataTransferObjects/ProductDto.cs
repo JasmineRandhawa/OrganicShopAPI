@@ -1,6 +1,7 @@
 namespace OrganicShopAPI.DataTransferObjects
 {
     public class ProductDto {
+
         public string Title { get; set; }
 
         public decimal Price { get; set; }

@@ -8,7 +8,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OpenApi.Models;
-
 using OrganicShopAPI.DataAccess;
 using OrganicShopAPI.Models;
 
@@ -83,6 +82,7 @@ namespace OrganicShopAPI
         private static IEdmModel GetEdmModel()
         {
             var builder = new ODataConventionModelBuilder();
+            builder.EnableLowerCamelCase();
             builder.EntitySet<Category>("Categories");
             builder.EntitySet<Product>("Products");
             builder.EntitySet<AppUser>("Users");
