@@ -25,6 +25,36 @@ namespace OrganicShopAPITest.IntegrationTests
         }
 
         [Fact]
+        public async Task AddNewCategory_ExpectedCategoriesCountToBeOne()
+        {
+            var configurationBuilder = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+            var optionsBuilder = new DbContextOptionsBuilder<OrganicShopDbContext>();
+            optionsBuilder.UseSqlServer(configurationBuilder["ConnectionStrings:DefaultConnection"]);
+
+            var context = new OrganicShopDbContext(optionsBuilder.Options);
+
+            await context.Database.EnsureDeletedAsync();
+            await context.Database.EnsureCreatedAsync();
+            //await context.Database.MigrateAsync();
+
+            // Arrange
+            var request = TestRoutes.AddCategory;
+            Category category = new Category();
+            category.Name = "Bakery";
+
+            // Act
+            var response = await Client.PostAsync(request, category.GetStringContent());
+
+            var content = await response.Content.ReadAsStringAsync();
+            var dbCategory = content.GetDeserializedObject<Category>();
+
+            Assert.NotNull(response);
+            Assert.Equal(response.StatusCode, (HttpStatusCode)StatusCodes.Status201Created);
+            Assert.True(dbCategory.Id == 1);
+            Assert.True(dbCategory.Name.Equals("Bakery"));
+        }
+
+        [Fact]
         public async Task GetAllCategories_WithoutFilter_ReturnsListOfAllCategories()
         {
             var configurationBuilder = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
@@ -33,12 +63,10 @@ namespace OrganicShopAPITest.IntegrationTests
 
             var context = new OrganicShopDbContext(optionsBuilder.Options);
 
-            using (var dbContext = context)
-            {
-                await dbContext.Database.EnsureDeletedAsync();
-                await dbContext.Database.EnsureCreatedAsync();
-                dbContext.Database.Migrate();
-            }
+            //await context.Database.EnsureDeletedAsync();
+            //await context.Database.EnsureCreatedAsync();
+            //await context.Database.MigrateAsync();
+
             // Arrange
             var request = TestRoutes.AllCategories;
 
@@ -46,12 +74,12 @@ namespace OrganicShopAPITest.IntegrationTests
             var response = await Client.GetAsync(request);
 
             var content = await response.Content.ReadAsStringAsync();
-            var categories = content.GetDeserializedObject<Category>();
+            var categories = content.GetDeserializedList<Category>();
 
             Assert.NotNull(response);
             Assert.Equal(response.StatusCode,(HttpStatusCode) StatusCodes.Status200OK);
             Assert.NotNull(categories);
-            Assert.True(categories.Count() > 0);
+            Assert.True(categories.Count() == 0);
         }
     }
 }
