@@ -79,7 +79,7 @@ namespace OrganicShopAPITest.IntegrationTests
             Assert.NotNull(response);
             Assert.Equal(response.StatusCode,(HttpStatusCode) StatusCodes.Status200OK);
             Assert.NotNull(categories);
-            Assert.True(categories.Count() == 0);
+            Assert.True(categories.Count() > 0);
         }
     }
 }
