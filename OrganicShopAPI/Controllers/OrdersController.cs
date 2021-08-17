@@ -50,7 +50,7 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (Id <= 0)
-                    return BadRequest(nameof(Id) + ErrorMessages.LessThenZero);
+                    return BadRequest(nameof(Id) + ErrorMessages.LessThanEqualToZero);
 
                 var orders = await GetFilteredOrders((cart) => cart.ShoppingCart.AppUserId == Id);
                 if (orders == null)
@@ -80,7 +80,7 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (Id <= 0)
-                    return BadRequest(nameof(Id) + ErrorMessages.LessThenZero);
+                    return BadRequest(nameof(Id) + ErrorMessages.LessThanEqualToZero);
 
                 var order = (await GetFilteredOrders((cart) => cart.Id == Id)).FirstOrDefault(); ;
 
@@ -104,7 +104,7 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (order.ShoppingCartId <= 0)
-                    return BadRequest(nameof(order.ShoppingCartId) + ErrorMessages.LessThenZero);
+                    return BadRequest(nameof(order.ShoppingCartId) + ErrorMessages.LessThanEqualToZero);
 
                 var shoppingCart = await _cartRepository.Get(order.ShoppingCartId);
 
@@ -182,6 +182,7 @@ namespace OrganicShopAPI.Controllers
             {
                 Title = product.Title,
                 Category = product.Category.Name,
+                Price = product.Price,
                 ImageURL = product.ImageURL
             };
         }

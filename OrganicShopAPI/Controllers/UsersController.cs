@@ -116,7 +116,7 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (Id <= 0)
-                    return BadRequest($"{nameof(AppUser)}{nameof(Id) + ErrorMessages.LessThenZero}");
+                    return BadRequest($"{nameof(AppUser)}{nameof(Id) + ErrorMessages.LessThanEqualToZero}");
 
                 var dbAppUser = await _userRepository.Get(Id);
                 if (dbAppUser == null)
@@ -143,7 +143,7 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (Id <= 0)
-                    return BadRequest($"{nameof(AppUser)} {nameof(Id) + ErrorMessages.LessThenZero}");
+                    return BadRequest($"{nameof(AppUser)} {nameof(Id) + ErrorMessages.LessThanEqualToZero}");
 
                 var dbAppUser = await _userRepository.Get(Id);
                 if (dbAppUser == null)
@@ -178,7 +178,7 @@ namespace OrganicShopAPI.Controllers
 
             // Id validation on update operation
             if (user.Id <= 0 && action == Constants.Action.Update)
-                return nameof(user.Id) + ErrorMessages.LessThenZero;
+                return nameof(user.Id) + ErrorMessages.LessThanEqualToZero;
 
             // Name validation
             if (string.IsNullOrWhiteSpace(user.Name))

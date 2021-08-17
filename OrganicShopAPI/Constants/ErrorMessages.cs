@@ -2,7 +2,7 @@
 {
     public static class ErrorMessages
     {
-        public const string LessThenZero = " should be greater than 0.";
+        public const string LessThanEqualToZero = " should be greater than 0.";
         public const string EmptyOrWhiteSpace = " cannot be empty string or white space.";
         public const string InvalidURL = " is not a valid URL.";
         public const string InvalidEmail = " is not a valid Email Address.";

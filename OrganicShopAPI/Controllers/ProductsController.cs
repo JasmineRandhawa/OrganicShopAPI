@@ -100,6 +100,7 @@ namespace OrganicShopAPI.Controllers
                 dbProduct.Title = product.Title;
                 dbProduct.ImageURL = product.ImageURL;
                 dbProduct.CategoryId = product.CategoryId;
+                dbProduct.Price = product.Price;
 
                 await _context.SaveChangesAsync();
                 return Ok(dbProduct);
@@ -120,7 +121,7 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (Id <= 0)
-                    return BadRequest($"{nameof(Product)}{nameof(Id) + ErrorMessages.LessThenZero}");
+                    return BadRequest($"{nameof(Product)}{nameof(Id) + ErrorMessages.LessThanEqualToZero}");
 
                 var dbProduct = await GetProductById(Id);
                 if (dbProduct == null)
@@ -146,7 +147,7 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (Id <= 0)
-                    return BadRequest($"{nameof(Product)}{nameof(Id) + ErrorMessages.LessThenZero}");
+                    return BadRequest($"{nameof(Product)}{nameof(Id) + ErrorMessages.LessThanEqualToZero}");
 
                 var dbProduct = await GetProductById(Id);
                 if (dbProduct == null)
@@ -175,11 +176,15 @@ namespace OrganicShopAPI.Controllers
 
             // Id validation on update operation
             if (product.Id <= 0 && action == Constants.Action.Update)
-                return nameof(product.Id) + ErrorMessages.LessThenZero;
+                return nameof(product.Id) + ErrorMessages.LessThanEqualToZero;
 
             // Title validation
             if (string.IsNullOrWhiteSpace(product.Title))
                 errorMessage += nameof(product.Title) + ErrorMessages.EmptyOrWhiteSpace;
+
+            // Price validation
+            if (product.Price <= 0)
+                errorMessage += nameof(product.Price) + ErrorMessages.LessThanEqualToZero;
 
             // ImageURL validations
             if (string.IsNullOrWhiteSpace(product.ImageURL))

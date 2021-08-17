@@ -90,6 +90,7 @@ content-type: application/json
 
 {
     "Title" : "Bread",
+    "Price" : 1.9,
     "ImageURL" : "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/199px-Red_Apple.jpg",
     "CategoryId" : 1,
     "IsActive" : true
@@ -102,6 +103,7 @@ content-type: application/json
 {
     "Id" : 1,
     "Title" : "Green Apple",
+     "Price" : 2.9,
     "ImageURL" : "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/199px-Red_Apple.jpg",
     "CategoryId" : 1,
     "IsActive" : false

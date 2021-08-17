@@ -44,7 +44,7 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (Id <= 0)
-                    return BadRequest(nameof(Id) + ErrorMessages.LessThenZero);
+                    return BadRequest(nameof(Id) + ErrorMessages.LessThanEqualToZero);
 
                 var shoppingCart = await GetFilteredCart((cart) => cart.AppUserId == Id);
                 if (shoppingCart == null)
@@ -70,7 +70,7 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (Id <= 0)
-                    return BadRequest(nameof(Id) + ErrorMessages.LessThenZero);
+                    return BadRequest(nameof(Id) + ErrorMessages.LessThanEqualToZero);
 
                 var shoppingCart = await GetFilteredCart((cart) => cart.Id == Id);
 
@@ -152,7 +152,7 @@ namespace OrganicShopAPI.Controllers
             try
             {
                 if (Id <= 0)
-                    return BadRequest($"{nameof(ShoppingCart)}{nameof(Id) + ErrorMessages.LessThenZero}");
+                    return BadRequest($"{nameof(ShoppingCart)}{nameof(Id) + ErrorMessages.LessThanEqualToZero}");
 
                 var dbShoppingCart = await _cartRepository.Get(Id);
                 if (dbShoppingCart == null)
@@ -180,7 +180,7 @@ namespace OrganicShopAPI.Controllers
 
             // Id validation on update operation
             if (shoppingCart.Id <= 0 && action == Constants.Action.Update)
-                return nameof(shoppingCart.Id) + ErrorMessages.LessThenZero;
+                return nameof(shoppingCart.Id) + ErrorMessages.LessThanEqualToZero;
 
             // Items validation
             if (shoppingCart.Items==null || (shoppingCart.Items != null && shoppingCart.Items.Count() == 0))
@@ -214,6 +214,7 @@ namespace OrganicShopAPI.Controllers
             {
                 Title = product.Title,
                 Category = product.Category.Name,
+                Price = product.Price,
                 ImageURL = product.ImageURL
             };
         }
