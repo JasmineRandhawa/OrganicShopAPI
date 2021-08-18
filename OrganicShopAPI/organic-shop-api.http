@@ -1,9 +1,9 @@
-### GetAll Categories
+### GetAll Users
 GET https://localhost:5001/Api/Users/All HTTP/1.1
 content-type: application/json
 
 ### GetAll User OData
-GET https://localhost:5001/Api/Users/All?$filter=Id eq 3
+GET https://localhost:5001/Api/Users/All?$filter=Id eq 1
 & $select=Name,Email HTTP/1.1
 content-type: application/json
 
@@ -52,18 +52,17 @@ POST https://localhost:5001/Api/Categories/Add HTTP/1.1
 content-type: application/json
 
 {
-    "Name" : "SeaFood",
+    "Name" : "Icecream",
     "IsActive" : false
 }
 
 ### Update Category
-PUT https://localhost:5001/Api/Categories/Update HTTP/1.1
+PATCH https://localhost:5001/Api/Categories/Update HTTP/1.1
 content-type: application/json
 
 {
-    "Id" : 8,
-    "Name" : "SeaFood and Fish",
-    "IsActive" : true
+    "Id" : 11,
+    "Name" : "Ice Cream"
 }
 
 ### Deactivate Category
@@ -81,7 +80,7 @@ content-type: application/json
 
 ### GetAll Product OData
 GET https://localhost:5001/Api/Products/All?$filter=Id eq 1
-& $select=Title,ImageURL HTTP/1.1
+& $select=Title,ImageURL,IsActive HTTP/1.1
 content-type: application/json
 
 ### Add Product

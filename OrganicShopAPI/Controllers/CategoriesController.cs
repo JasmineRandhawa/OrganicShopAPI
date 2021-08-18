@@ -73,7 +73,7 @@ namespace OrganicShopAPI.Controllers
             }
         }
 
-        [HttpPut(Routes.Update)]
+        [HttpPatch(Routes.Update)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Category))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
@@ -92,7 +92,6 @@ namespace OrganicShopAPI.Controllers
                     return NotFound($"{nameof(Category)}{nameof(category.Id)} '{category.Id}' {ErrorMessages.DoesNotExist}");
 
                 dbCategory.Name = category.Name;
-                dbCategory.IsActive = category.IsActive;
 
                 await _context.SaveChangesAsync();
                 return Ok(dbCategory);
@@ -104,7 +103,7 @@ namespace OrganicShopAPI.Controllers
         }
 
         [HttpPatch(Routes.Activate)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Category))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -122,7 +121,7 @@ namespace OrganicShopAPI.Controllers
                 dbCategory.IsActive = true;
 
                 await _context.SaveChangesAsync();
-                return Ok(dbCategory);
+                return Ok();
             }
             catch (Exception)
             {
@@ -131,7 +130,7 @@ namespace OrganicShopAPI.Controllers
         }
 
         [HttpPatch(Routes.Deactivate)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Category))]
+        [ProducesResponseType(StatusCodes.Status200OK))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -148,7 +147,7 @@ namespace OrganicShopAPI.Controllers
 
                 dbCategory.IsActive = false;
                 await _context.SaveChangesAsync();
-                return Ok(dbCategory);
+                return Ok();
             }
             catch (Exception)
             {

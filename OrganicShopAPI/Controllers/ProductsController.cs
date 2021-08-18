@@ -80,7 +80,7 @@ namespace OrganicShopAPI.Controllers
         }
 
         [HttpPut(Routes.Update)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Product))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -112,7 +112,7 @@ namespace OrganicShopAPI.Controllers
         }
 
         [HttpPatch(Routes.Activate)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Product))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -129,7 +129,7 @@ namespace OrganicShopAPI.Controllers
 
                 dbProduct.IsActive = true;
                 await _context.SaveChangesAsync();
-                return Ok(dbProduct);
+                return Ok();
             }
             catch (Exception)
             {
@@ -138,7 +138,7 @@ namespace OrganicShopAPI.Controllers
         }
 
         [HttpPatch(Routes.Deactivate)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Product))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -155,7 +155,7 @@ namespace OrganicShopAPI.Controllers
 
                 dbProduct.IsActive = false;
                 await _context.SaveChangesAsync();
-                return Ok(dbProduct);
+                return Ok();
             }
             catch (Exception)
             {
