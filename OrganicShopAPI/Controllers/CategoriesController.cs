@@ -130,7 +130,7 @@ namespace OrganicShopAPI.Controllers
         }
 
         [HttpPatch(Routes.Deactivate)]
-        [ProducesResponseType(StatusCodes.Status200OK))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
