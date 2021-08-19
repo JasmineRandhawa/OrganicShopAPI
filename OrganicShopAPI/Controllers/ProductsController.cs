@@ -41,7 +41,6 @@ namespace OrganicShopAPI.Controllers
         [EnableQuery]
         [Route(Routes.All)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Product>))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetAll()
         {
@@ -208,9 +207,9 @@ namespace OrganicShopAPI.Controllers
         private async Task<Product> GetProductById(int Id)
         {
             return await _productRepository.GetAll()
-                                                 .Where(product => product.Id == Id)
-                                                 .Include(product => product.Category)
-                                                 .FirstOrDefaultAsync();
+                                            .Where(product => product.Id == Id)
+                                            .Include(product => product.Category)
+                                            .FirstOrDefaultAsync();
         }
         #endregion
     }

@@ -35,7 +35,6 @@ namespace OrganicShopAPI.Controllers
         [EnableQuery]
         [Route(Routes.All)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IQueryable<Category>))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetAll()
         {

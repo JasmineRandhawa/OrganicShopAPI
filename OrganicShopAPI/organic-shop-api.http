@@ -12,7 +12,8 @@ POST https://localhost:5001/Api/Users/Add HTTP/1.1
 content-type: application/json
 
 {
-    "Name" : "Jasmine",
+    "AppUserId":"abc",
+    "AppUserName" : "Jasmine",
     "Email" : "jasmine@abc.com",
     "IsAdmin" : false,
     "IsActive" : false
@@ -118,25 +119,22 @@ content-type: application/json
 
 ###---------------------------------------------------------------------------------
 ### GetAll ShoppingCart By User
-GET https://localhost:5001/Api/ShoppingCart/User/1 HTTP/1.1
+GET https://localhost:5001/Api/ShoppingCart/User/v06EVMJt0YMBTsGFfp0inhoeAyK2 HTTP/1.1
 content-type: application/json
 
 ### GetById ShoppingCart By Id
-GET https://localhost:5001/Api/ShoppingCart/2 HTTP/1.1
+GET https://localhost:5001/Api/ShoppingCart/2005 HTTP/1.1
 content-type: application/json
 
 ### Add ShoppingCart
-POST https://localhost:5001/Api/ShoppingCart/Add HTTP/1.1
+POST https://localhost:5001/Api/ShoppingCart/Item/Add HTTP/1.1
 content-type: application/json
 
 {
-    "AppUserId" : 1,
-    "Items" : [
-        {
-            "ProductId" : 3,
-            "Quantity" : 5
-        }
-    ]
+    "Id": 1002,
+    "ProductId": 1,
+    "Quantity": 1,
+    "ShoppingCartId": 2005
 }
 
 ### Update ShoppingCart
@@ -145,7 +143,6 @@ content-type: application/json
 
 {
     "Id" : 2,
-    "AppUserId" : 1,
     "Items" : [
         {
             "ProductId" : 1,
@@ -159,8 +156,17 @@ content-type: application/json
 }
 
 ### Delete ShoppingCart
-DELETE https://localhost:5001/Api/ShoppingCart/1 HTTP/1.1
+DELETE https://localhost:5001/Api/ShoppingCart/1003 HTTP/1.1
 content-type: application/json
+
+### Delete an ShoppingCartItem
+DELETE https://localhost:5001/Api/ShoppingCart/Item/14 HTTP/1.1
+content-type: application/json
+
+### DeleteAll ShoppingCartItems
+DELETE https://localhost:5001/Api/ShoppingCart/All/2004 HTTP/1.1
+content-type: application/json
+
 
 ###---------------------------------------------------------------------------------
 ### GetAll Orders By User

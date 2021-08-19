@@ -9,6 +9,8 @@ namespace OrganicShopAPI.DataAccess
 
         Task<TEntity> Get(int Id);
 
+        Task<TEntity> Get(string Id);
+
         Task Add(TEntity tEntity);
 
         void Delete(TEntity tEntity);

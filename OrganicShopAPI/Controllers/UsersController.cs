@@ -66,7 +66,7 @@ namespace OrganicShopAPI.Controllers
 
                 await _userRepository.Add(user);
                 await _context.SaveChangesAsync();
-                var dbAppUser = await _userRepository.Get(user.Id);
+                var dbAppUser = await _userRepository.Get(user.AppUserId);
                 return Created("", dbAppUser);
             }
             catch (Exception)
@@ -89,11 +89,11 @@ namespace OrganicShopAPI.Controllers
                 if (!string.IsNullOrWhiteSpace(checkInputErrorMessage))
                     return BadRequest(checkInputErrorMessage);
 
-                var dbAppUser = await _userRepository.Get(user.Id);
+                var dbAppUser = await _userRepository.Get(user.AppUserId);
                 if (dbAppUser == null)
-                    return NotFound($"{nameof(AppUser)} {nameof(user.Id)} '{user.Id}' {ErrorMessages.DoesNotExist}");
+                    return NotFound($"{nameof(AppUser)} {nameof(user.AppUserId)} '{user.AppUserId}' {ErrorMessages.DoesNotExist}");
 
-                dbAppUser.Name = user.Name;
+                dbAppUser.AppUserName = user.AppUserName;
                 dbAppUser.Email = user.Email;
                 dbAppUser.IsAdmin = user.IsAdmin;
 
@@ -111,12 +111,12 @@ namespace OrganicShopAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Activate(int Id)
+        public async Task<IActionResult> Activate(string Id)
         {
             try
             {
-                if (Id <= 0)
-                    return BadRequest($"{nameof(AppUser)}{nameof(Id) + ErrorMessages.LessThanEqualToZero}");
+                if (string.IsNullOrWhiteSpace(Id))
+                    return BadRequest($"{nameof(AppUser)}{nameof(Id) + ErrorMessages.EmptyOrWhiteSpace}");
 
                 var dbAppUser = await _userRepository.Get(Id);
                 if (dbAppUser == null)
@@ -138,12 +138,12 @@ namespace OrganicShopAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Deactivate(int Id)
+        public async Task<IActionResult> Deactivate(string Id)
         {
             try
             {
-                if (Id <= 0)
-                    return BadRequest($"{nameof(AppUser)} {nameof(Id) + ErrorMessages.LessThanEqualToZero}");
+                if (string.IsNullOrWhiteSpace(Id))
+                    return BadRequest($"{nameof(AppUser)}{nameof(Id) + ErrorMessages.EmptyOrWhiteSpace}");
 
                 var dbAppUser = await _userRepository.Get(Id);
                 if (dbAppUser == null)
@@ -177,12 +177,12 @@ namespace OrganicShopAPI.Controllers
                 return nameof(user) + ErrorMessages.NullParameter;
 
             // Id validation on update operation
-            if (user.Id <= 0 && action == Constants.Action.Update)
-                return nameof(user.Id) + ErrorMessages.LessThanEqualToZero;
+            if (!string.IsNullOrWhiteSpace(user.AppUserId) && action == Constants.Action.Update)
+                return nameof(user.AppUserId) + ErrorMessages.LessThanEqualToZero;
 
             // Name validation
-            if (string.IsNullOrWhiteSpace(user.Name))
-                errorMessage += nameof(user.Name) + ErrorMessages.EmptyOrWhiteSpace;
+            if (string.IsNullOrWhiteSpace(user.AppUserName))
+                errorMessage += nameof(user.AppUserName) + ErrorMessages.EmptyOrWhiteSpace;
 
             // Email validation
             if (string.IsNullOrWhiteSpace(user.Email))

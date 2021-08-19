@@ -22,6 +22,11 @@ namespace OrganicShopAPI.DataAccess
             return await _context.Set<TEntity>().FindAsync(id);
         }
 
+        public async Task<TEntity> Get(string id)
+        {
+            return await _context.Set<TEntity>().FindAsync(id);
+        }
+
         public async Task Add(TEntity tEntity)
         {
             await _context.Set<TEntity>().AddAsync(tEntity);

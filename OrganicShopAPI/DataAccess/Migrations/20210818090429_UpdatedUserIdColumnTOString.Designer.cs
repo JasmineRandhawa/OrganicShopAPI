@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OrganicShopAPI.DataAccess;
 
 namespace OrganicShopAPI.Migrations
 {
     [DbContext(typeof(OrganicShopDbContext))]
-    partial class OrganicShopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210818090429_UpdatedUserIdColumnTOString")]
+    partial class UpdatedUserIdColumnTOString
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -20,11 +22,8 @@ namespace OrganicShopAPI.Migrations
 
             modelBuilder.Entity("OrganicShopAPI.Models.AppUser", b =>
                 {
-                    b.Property<string>("AppUserId")
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("AppUserName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
@@ -35,7 +34,10 @@ namespace OrganicShopAPI.Migrations
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("bit");
 
-                    b.HasKey("AppUserId");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
 
                     b.ToTable("AppUsers");
                 });
@@ -121,10 +123,7 @@ namespace OrganicShopAPI.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AppUserId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AppUserName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("DateCreated")
                         .HasColumnType("nvarchar(max)");
@@ -133,6 +132,8 @@ namespace OrganicShopAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
 
                     b.ToTable("ShoppingCart");
                 });
@@ -182,6 +183,15 @@ namespace OrganicShopAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("OrganicShopAPI.Models.ShoppingCart", b =>
+                {
+                    b.HasOne("OrganicShopAPI.Models.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId");
+
+                    b.Navigation("AppUser");
                 });
 
             modelBuilder.Entity("OrganicShopAPI.Models.ShoppingCartItem", b =>

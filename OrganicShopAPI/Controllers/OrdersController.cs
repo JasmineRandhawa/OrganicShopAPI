@@ -45,12 +45,12 @@ namespace OrganicShopAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByUser(int Id)
+        public async Task<IActionResult> GetByUser(string Id)
         {
             try
             {
-                if (Id <= 0)
-                    return BadRequest(nameof(Id) + ErrorMessages.LessThanEqualToZero);
+                if (string.IsNullOrWhiteSpace(Id))
+                    return BadRequest($"{nameof(AppUser)}{nameof(Id) + ErrorMessages.EmptyOrWhiteSpace}");
 
                 var orders = await GetFilteredOrders((cart) => cart.ShoppingCart.AppUserId == Id);
                 if (orders == null)
@@ -134,8 +134,12 @@ namespace OrganicShopAPI.Controllers
             foreach (var order in orders)
             {
                 var orderObj = order;
-                orderObj.ShoppingCart.AppUser = await _userRepository.Get(order.ShoppingCart.AppUserId);
-
+                var appUser = await _userRepository.Get(order.ShoppingCart.AppUserId);
+                if(appUser!=null)
+                {
+                    order.ShoppingCart.AppUserId = appUser.AppUserId;
+                    order.ShoppingCart.AppUserName = appUser.AppUserName;
+                }
                 OrderDto orderResponse = new();
                 orderResponse.Id = order.Id;
                 orderResponse.UserName = order.UserName;
@@ -149,7 +153,12 @@ namespace OrganicShopAPI.Controllers
 
         private async Task<OrderDto> ConstructOrderResponse(Order order)
         {
-            order.ShoppingCart.AppUser = await _userRepository.Get(order.ShoppingCart.AppUserId);
+            var appUser = await _userRepository.Get(order.ShoppingCart.AppUserId);
+            if (appUser != null)
+            {
+                order.ShoppingCart.AppUserId = appUser.AppUserId;
+                order.ShoppingCart.AppUserName = appUser.AppUserName;
+            }
 
             OrderDto orderResponse = new();
             orderResponse.Id = order.Id;
@@ -165,7 +174,7 @@ namespace OrganicShopAPI.Controllers
             ShoppingCartDto shoppingCartResponse = new();
             shoppingCartResponse.Id = shoppingCart.Id;
             shoppingCartResponse.AppUserId = shoppingCart.AppUserId;
-            shoppingCartResponse.AppUserName = shoppingCart.AppUser.Name;
+            shoppingCartResponse.AppUserName = shoppingCart.AppUserName;
             foreach (var item in shoppingCart.Items)
             {
                 ShoppingCartItemDto shoppingCartItem = new ShoppingCartItemDto();

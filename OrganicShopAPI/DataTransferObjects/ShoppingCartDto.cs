@@ -8,7 +8,7 @@ namespace OrganicShopAPI.DataTransferObjects
 
         public List<ShoppingCartItemDto> Items { get; set; } = new();
 
-        public int AppUserId { get; set; }
+        public string AppUserId { get; set; }
 
         public string AppUserName { get; set; }
     }

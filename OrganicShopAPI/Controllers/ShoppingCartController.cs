@@ -22,11 +22,16 @@ namespace OrganicShopAPI.Controllers
 
         private readonly OrganicShopDbContext _context;
         private readonly IRepository<ShoppingCart> _cartRepository;
+        private readonly IRepository<AppUser> _userRepository;
+        private readonly IRepository<ShoppingCartItem> _shoppingCartItemRepository;
 
-        public ShoppingCartController(OrganicShopDbContext context, IRepository<ShoppingCart> shoppingCartRepository)
+        public ShoppingCartController(OrganicShopDbContext context, IRepository<ShoppingCartItem> shoppingCartItemRepository,
+            IRepository<ShoppingCart> shoppingCartRepository,IRepository<AppUser> userRepository)
         {
             _context = context;
             _cartRepository = shoppingCartRepository;
+            _userRepository = userRepository;
+            _shoppingCartItemRepository = shoppingCartItemRepository;
         }
 
         #endregion
@@ -39,18 +44,18 @@ namespace OrganicShopAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByUser(int Id)
+        public async Task<IActionResult> GetByUser(string Id)
         {
             try
             {
-                if (Id <= 0)
-                    return BadRequest(nameof(Id) + ErrorMessages.LessThanEqualToZero);
+                if (string.IsNullOrWhiteSpace(Id))
+                    return BadRequest($"{nameof(AppUser)}{nameof(Id) + ErrorMessages.EmptyOrWhiteSpace}");
 
-                var shoppingCart = await GetFilteredCart((cart) => cart.AppUserId == Id);
+                var shoppingCart = await GetFilteredCart((cart) => cart.AppUserId.Equals(Id));
                 if (shoppingCart == null)
                     return NotFound($"{nameof(ShoppingCart)} with {nameof(AppUser)}{nameof(Id)} '{Id}' {ErrorMessages.DoesNotExist}");
 
-                return Ok(ConstructShoppingCartResponse(shoppingCart));
+                return Ok(ConstructShoppingCartResponseAsync(shoppingCart));
                                         
             }
             catch(Exception)
@@ -77,7 +82,7 @@ namespace OrganicShopAPI.Controllers
                 if (shoppingCart == null)
                     return NotFound($"{nameof(ShoppingCart)}{nameof(Id)} '{Id}' {ErrorMessages.DoesNotExist}");
 
-                return Ok(ConstructShoppingCartResponse(shoppingCart));
+                return Ok(ConstructShoppingCartResponseAsync(shoppingCart));
             }
             catch (Exception)
             {
@@ -98,12 +103,15 @@ namespace OrganicShopAPI.Controllers
                 if (!string.IsNullOrWhiteSpace(checkInputErrorMessage))
                     return BadRequest(checkInputErrorMessage);
 
+                var appUser = await _userRepository.Get(shoppingCart.AppUserId);
+                if (appUser != null)
+                    shoppingCart.AppUserName = appUser.AppUserName;
                 shoppingCart.DateCreated = DateTime.UtcNow.ToString();
                 await _cartRepository.Add(shoppingCart);
 
                 await _context.SaveChangesAsync();
                 var dbShoppingCart = await GetFilteredCart((cart) => cart.Id == shoppingCart.Id);
-                return Created("", ConstructShoppingCartResponse(dbShoppingCart));
+                return Created("", dbShoppingCart);
             }
             catch (Exception)
             {
@@ -111,30 +119,122 @@ namespace OrganicShopAPI.Controllers
             }
         }
 
-        [HttpPatch(Routes.Update)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ShoppingCartDto))]
+        [HttpPost(Routes.ItemAdd)]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(int))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Update(ShoppingCart shoppingCart)
+        public async Task<IActionResult> AddItem(ShoppingCartItem shoppingCartItem)
         {
             try
             {
-                var checkInputErrorMessage = ValidateShoppingCartInput(shoppingCart, Constants.Action.Update);
+                var checkInputErrorMessage = ValidateShoppingCartItemInput(shoppingCartItem, Constants.Action.Add);
 
                 if (!string.IsNullOrWhiteSpace(checkInputErrorMessage))
                     return BadRequest(checkInputErrorMessage);
 
-                var dbShoppingCart = await GetFilteredCart((cart) => cart.Id == shoppingCart.Id);
+                var dbShoppingCart = await _cartRepository.Get(shoppingCartItem.ShoppingCartId);
 
                 if (dbShoppingCart == null)
-                    return NotFound($"{nameof(ShoppingCart)}{nameof(shoppingCart.Id)} '{shoppingCart.Id}' {ErrorMessages.DoesNotExist}");
+                    return NotFound($"{nameof(shoppingCartItem.ShoppingCartId)} '{shoppingCartItem.ShoppingCartId}' {ErrorMessages.DoesNotExist}");
 
-                dbShoppingCart.Items = shoppingCart.Items;
-                dbShoppingCart.DateModified = DateTime.UtcNow.ToString();
+                await _shoppingCartItemRepository.Add(shoppingCartItem);
 
                 await _context.SaveChangesAsync();
-                return Ok(ConstructShoppingCartResponse(dbShoppingCart));
+                return Created("",shoppingCartItem.Id);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+
+        [HttpPatch(Routes.ItemUpdate)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ShoppingCartItem))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateItem(ShoppingCartItem shoppingCartItem)
+        {
+            try
+            {
+                var checkInputErrorMessage = ValidateShoppingCartItemInput(shoppingCartItem, Constants.Action.Update);
+
+                if (!string.IsNullOrWhiteSpace(checkInputErrorMessage))
+                    return BadRequest(checkInputErrorMessage);
+
+                var dbShoppingCartItem = await GetFilteredCartItem((cart) => cart.Id == shoppingCartItem.Id);
+
+                if (dbShoppingCartItem == null)
+                    return NotFound($"{nameof(ShoppingCartItem)}{nameof(shoppingCartItem.Id)} '{shoppingCartItem.Id}' {ErrorMessages.DoesNotExist}");
+
+                var dbShoppingCart = await _cartRepository.Get(dbShoppingCartItem.ShoppingCartId);
+                if(dbShoppingCart!=null)
+                    dbShoppingCart.DateModified = DateTime.UtcNow.ToString();
+
+                dbShoppingCartItem.Quantity = shoppingCartItem.Quantity;
+
+                await _context.SaveChangesAsync();
+                return Ok(dbShoppingCartItem);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpDelete(Routes.ItemId)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteItem(int ItemId)
+        {
+            try
+            {
+                if (ItemId <= 0)
+                    return BadRequest($"{nameof(ShoppingCart)}{nameof(ItemId) + ErrorMessages.LessThanEqualToZero}");
+
+                var dbShoppingCartItem = await _shoppingCartItemRepository.Get(ItemId);
+                if (dbShoppingCartItem == null)
+                    return NotFound($"{nameof(ShoppingCart)}{nameof(ItemId)} '{ItemId}' {ErrorMessages.DoesNotExist}");
+
+                _shoppingCartItemRepository.Delete(dbShoppingCartItem);
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpDelete(Routes.AllId)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteAll(int Id)
+        {
+            try
+            {
+                if (Id <= 0)
+                    return BadRequest($"{nameof(ShoppingCart)}{nameof(Id) + ErrorMessages.LessThanEqualToZero}");
+
+                var dbShoppingCart = await GetFilteredCart((cart) => cart.Id ==Id);
+                if (dbShoppingCart == null)
+                    return NotFound($"{nameof(ShoppingCart)}{nameof(Id)} '{Id}' {ErrorMessages.DoesNotExist}");
+
+                if(dbShoppingCart.Items!=null && dbShoppingCart.Items.Count() == 0)
+                    return NotFound($"{nameof(ShoppingCart)}{nameof(Id)} '{Id}' {ErrorMessages.EmptyCart}");
+
+                foreach (var item in dbShoppingCart.Items)
+                {
+                    _shoppingCartItemRepository.Delete(item);
+                }
+                await _context.SaveChangesAsync();
+                return NoContent();
             }
             catch (Exception)
             {
@@ -189,18 +289,47 @@ namespace OrganicShopAPI.Controllers
             return errorMessage;
         }
 
+        private string ValidateShoppingCartItemInput(ShoppingCartItem shoppingCartItem, Constants.Action action)
+        {
+            string errorMessage = string.Empty;
+
+            // shoppingCartItem parameter validation
+            if (shoppingCartItem == null)
+                return nameof(shoppingCartItem) + ErrorMessages.NullParameter;
+
+            // Id validation on update operation
+            if (shoppingCartItem.Id <= 0 && action == Constants.Action.Update)
+                return nameof(shoppingCartItem.Id) + ErrorMessages.LessThanEqualToZero;
+
+            // ShoppingCartId validation on update operation
+            if (shoppingCartItem.ShoppingCartId <= 0 && action == Constants.Action.Add)
+                return nameof(shoppingCartItem.ShoppingCartId) + ErrorMessages.LessThanEqualToZero;
+
+            // ProductId validation on update operation
+            if (shoppingCartItem.ProductId <= 0 )
+                return nameof(shoppingCartItem.ProductId) + ErrorMessages.LessThanEqualToZero;
+
+            // Quantity validation on update operation
+            if (shoppingCartItem.Quantity <= 0)
+                return nameof(shoppingCartItem.Quantity) + ErrorMessages.LessThanEqualToZero;
+
+            return errorMessage;
+        }
+
         #endregion
 
         #region "Shopping Cart Private Methods"
-        private ShoppingCartDto ConstructShoppingCartResponse(ShoppingCart shoppingCart)
+        private ShoppingCartDto ConstructShoppingCartResponseAsync(ShoppingCart shoppingCart)
         {
             ShoppingCartDto shoppingCartResponse = new();
             shoppingCartResponse.Id = shoppingCart.Id;
             shoppingCartResponse.AppUserId = shoppingCart.AppUserId;
-            shoppingCartResponse.AppUserName = shoppingCart.AppUser.Name;
+            shoppingCartResponse.AppUserName = shoppingCart.AppUserName;
             foreach (var item in shoppingCart.Items)
             {
                 ShoppingCartItemDto shoppingCartItem = new ShoppingCartItemDto();
+                shoppingCartItem.ShoppingCartId = shoppingCart.Id;
+                shoppingCartItem.Id = item.Id;
                 shoppingCartItem.Product = ConstructProductResponse(item.Product);
                 shoppingCartItem.Quantity = item.Quantity;
                 shoppingCartResponse.Items.Add(shoppingCartItem);
@@ -212,6 +341,7 @@ namespace OrganicShopAPI.Controllers
         {
             return new ProductDto
             {
+                Id = product.Id,
                 Title = product.Title,
                 Category = product.Category.Name,
                 Price = product.Price,
@@ -223,10 +353,17 @@ namespace OrganicShopAPI.Controllers
         {
             return await _cartRepository.GetAll()
                                         .Where(filter)
-                                        .Include(cart => cart.AppUser)
                                         .Include(cart => cart.Items)
                                         .ThenInclude(item => item.Product)
                                         .ThenInclude(product => product.Category)
+                                        .FirstOrDefaultAsync();
+        }
+
+        private async Task<ShoppingCartItem> GetFilteredCartItem(Expression<Func<ShoppingCartItem, bool>> filter)
+        {
+            return await _shoppingCartItemRepository.GetAll()
+                                        .Where(filter)
+                                        .Include(item => item.Product)
                                         .FirstOrDefaultAsync();
         }
 

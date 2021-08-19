@@ -9,9 +9,9 @@ namespace OrganicShopAPI.Models
 
         public IEnumerable<ShoppingCartItem> Items { get; set; } = new List<ShoppingCartItem>();
 
-        public AppUser AppUser { get; set; }
+        public string AppUserId { get; set; }
 
-        public int AppUserId { get; set; }
+        public string AppUserName { get; set; } = string.Empty;
 
         public string DateCreated { get; set; }
 
