@@ -123,36 +123,29 @@ GET https://localhost:5001/Api/ShoppingCart/User/v06EVMJt0YMBTsGFfp0inhoeAyK2 HT
 content-type: application/json
 
 ### GetById ShoppingCart By Id
-GET https://localhost:5001/Api/ShoppingCart/2005 HTTP/1.1
+GET https://localhost:5001/Api/ShoppingCart/2012 HTTP/1.1
 content-type: application/json
 
-### Add ShoppingCart
+### Add ShoppingCart item
 POST https://localhost:5001/Api/ShoppingCart/Item/Add HTTP/1.1
 content-type: application/json
 
 {
-    "Id": 1002,
+    "Id": 0,
     "ProductId": 1,
-    "Quantity": 1,
-    "ShoppingCartId": 2005
+    "Quantity": 2,
+    "ShoppingCartId": 2012
 }
 
-### Update ShoppingCart
-PATCH https://localhost:5001/Api/ShoppingCart/Update HTTP/1.1
+### update ShoppingCart item
+PATCH https://localhost:5001/Api/ShoppingCart/Item/Update HTTP/1.1
 content-type: application/json
 
 {
-    "Id" : 2,
-    "Items" : [
-        {
-            "ProductId" : 1,
-            "Quantity" : 2
-        },
-        {
-            "ProductId" : 2,
-            "Quantity" : 3
-        }
-    ]
+    "Id": 1003,
+    "ProductId": 2,
+    "Quantity": 5,
+    "ShoppingCartId": 2012
 }
 
 ### Delete ShoppingCart
